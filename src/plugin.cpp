@@ -14,9 +14,11 @@
 #include <QTemporaryDir>
 #include <albert/albert.h>
 #include <albert/logging.h>
+#include <albert/network/network.h>
 #include <archive.h>
 #include <archive_entry.h>
 ALBERT_LOGGING_CATEGORY("docs")
+using namespace albert::util::network;
 using namespace albert;
 using namespace std;
 
