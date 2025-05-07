@@ -14,13 +14,13 @@
 #include <QTemporaryDir>
 #include <albert/albert.h>
 #include <albert/logging.h>
-#include <albert/network/network.h>
+#include <albert/networkutil.h>
 #include <archive.h>
 #include <archive_entry.h>
 ALBERT_LOGGING_CATEGORY("docs")
-using namespace albert::util::network;
 using namespace albert;
 using namespace std;
+using namespace util;
 
 static const char *docsets_dir = "docsets";
 Plugin *Plugin::instance_ = nullptr;

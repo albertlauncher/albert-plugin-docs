@@ -8,7 +8,7 @@ class QNetworkReply;
 
 
 class Plugin : public albert::ExtensionPlugin,
-               public albert::IndexQueryHandler
+               public albert::util::IndexQueryHandler
 {
     ALBERT_PLUGIN
 

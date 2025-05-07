@@ -14,6 +14,7 @@
 #include <set>
 using namespace albert;
 using namespace std;
+using namespace util;
 
 
 Docset::Docset(QString n, QString t, QString sid, QString ip)

@@ -11,7 +11,7 @@ public:
 
     Docset(QString name, QString title, QString source_id, QString icon_path);
 
-    void createIndexItems(std::vector<albert::IndexItem> &results) const;
+    void createIndexItems(std::vector<albert::util::IndexItem> &results) const;
 
     bool isInstalled() const;
 
