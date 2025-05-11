@@ -91,7 +91,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Remove docset &apos;%1&apos; at %2?</source>
+        <source>Remove docset &apos;%1&apos;?</source>
         <translation></translation>
     </message>
 </context>

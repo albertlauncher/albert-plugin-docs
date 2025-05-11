@@ -34,6 +34,8 @@ private:
 
     void debug(const QString &);
     void error(const QString &, QWidget *modal_parent = nullptr);
+    std::filesystem::path docsetsLocation() const;
+    std::filesystem::path iconsLocation() const;
 
     std::vector<Docset> docsets_;
     QNetworkReply *download_ = nullptr;

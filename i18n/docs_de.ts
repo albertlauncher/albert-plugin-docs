@@ -11,24 +11,6 @@
         <source>Update</source>
         <translation>Aktualisieren</translation>
     </message>
-    <message>
-        <source>Remove docset &apos;%1&apos; at %2?</source>
-        <translation type="vanished">Docset &apos;%1&apos; (%2) entfernen?</translation>
-    </message>
-</context>
-<context>
-    <name>DocsetsModel</name>
-    <message>
-        <source>Remove docset &apos;%1&apos; at %2?</source>
-        <translation type="obsolete">Docset &apos;%1&apos; (%2) entfernen?</translation>
-    </message>
-</context>
-<context>
-    <name>DocumentationItem</name>
-    <message>
-        <source>Open documentation</source>
-        <translation type="vanished">Dokumentation öffnen</translation>
-    </message>
 </context>
 <context>
     <name>Plugin</name>
@@ -66,7 +48,7 @@
     </message>
     <message>
         <source>Renaming &apos;%1&apos; to &apos;%2&apos;</source>
-        <translation>&apos;%1&apos; zu &apos;%2&apos; umbenennen</translation>
+        <translation>Nenne &apos;%1&apos; zu &apos;%2&apos; um</translation>
     </message>
     <message>
         <source>Docset &apos;%1&apos; ready.</source>
@@ -94,7 +76,7 @@
     </message>
     <message>
         <source>Cancelled &apos;%1&apos; docset download.</source>
-        <translation>Abgebrochener Download des Docsets &apos;%1&apos;.</translation>
+        <translation>Download des Docsets &apos;%1&apos; abgebrochen.</translation>
     </message>
     <message>
         <source>Directory removed &apos;%1&apos;</source>
@@ -109,8 +91,8 @@
         <translation>Dokumentation öffnen</translation>
     </message>
     <message>
-        <source>Remove docset &apos;%1&apos; at %2?</source>
-        <translation>Docset &apos;%1&apos; (%2) entfernen?</translation>
+        <source>Remove docset &apos;%1&apos;?</source>
+        <translation>Docset &apos;%1&apos; entfernen?</translation>
     </message>
 </context>
 </TS>

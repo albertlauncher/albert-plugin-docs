@@ -22,7 +22,6 @@ using namespace albert;
 using namespace std;
 using namespace util;
 
-static const char *docsets_dir = "docsets";
 Plugin *Plugin::instance_ = nullptr;
 
 static QString extract(const QString &src, const QString &dst)
@@ -94,8 +93,8 @@ Plugin::Plugin()
     if(!QSqlDatabase::isDriverAvailable("QSQLITE"))
         throw "QSQLITE driver unavailable";
 
-    tryCreateDirectory(dataLocation() / docsets_dir);
-    tryCreateDirectory(dataLocation() / "icons");
+    tryCreateDirectory(docsetsLocation());
+    tryCreateDirectory(iconsLocation());
 
     connect(this, &Plugin::docsetsChanged, this, &Plugin::updateIndexItems);
 
@@ -142,7 +141,7 @@ void Plugin::updateDocsetList()
         reply->deleteLater();
 
         QByteArray replyData;
-        QFile cachedDocsetListFile(QDir(cacheLocation()).filePath("zeal_docset_list.json"));
+        QFile cachedDocsetListFile(QDir(dataLocation()).filePath("zeal_docset_list.json"));
 
         if (reply->error() != QNetworkReply::NoError)
         {
@@ -165,18 +164,17 @@ void Plugin::updateDocsetList()
         {
             for (const QJsonValue &val : json_document.array())
             {
-                QJsonObject obj = val.toObject();
+                const QJsonObject obj = val.toObject();
+                const auto name = obj[QStringLiteral("name")].toString();
+                const auto title = obj[QStringLiteral("title")].toString();
+                const auto source = obj[QStringLiteral("sourceId")].toString();
+                const auto icon_path = QDir(iconsLocation()).filePath(QString("%1.png").arg(name));
+                const auto rawBase64 = obj[QStringLiteral("icon2x")].toString().toLocal8Bit();
 
-                auto name = obj[QStringLiteral("name")].toString();
-                auto title = obj[QStringLiteral("title")].toString();
-                auto source = obj[QStringLiteral("sourceId")].toString();
-                auto icon_path = QDir(cacheLocation()).filePath(QString("icons/%1.png").arg(name));
-                auto rawBase64 = obj[QStringLiteral("icon2x")].toString().toLocal8Bit();
                 saveBase64ImageToFile(rawBase64, icon_path);
-
                 docsets_.emplace_back(name, title, source, icon_path);
 
-                QDir dir(QString("%1/%2.docset").arg(QDir(dataLocation()).filePath(docsets_dir), name));
+                QDir dir(QString("%1/%2.docset").arg(docsetsLocation().c_str(), name));
                 if (dir.exists())
                     docsets_.back().path = dir.path();
             }
@@ -220,29 +218,34 @@ void Plugin::downloadDocset(uint index)
         emit statusInfo(info);
     });
 
-    connect(download_, &QNetworkReply::finished, this, [this, &ds] () mutable
+    connect(download_, &QNetworkReply::finished, this, [this, &ds]
     {
         if (download_)  // else aborted
         {
-            auto tmp_dir = QTemporaryDir();
-            if (tmp_dir.isValid())
+            debug("Download finished.");
+            if (auto tmp_dir = QTemporaryDir();
+                tmp_dir.isValid())
             {
                 // write downloaded data to file
-                if (QFile file(tmp_dir.filePath(download_->url().fileName())); file.open(QIODevice::WriteOnly))
+                if (QFile file(tmp_dir.filePath(download_->url().fileName()));
+                    file.open(QIODevice::WriteOnly))
                 {
                     while (download_->bytesAvailable())
-                        file.write(download_->read(1000000));
+                        file.write(download_->read(1'000'000));
                     file.close();
 
                     debug(tr("Extracting file '%1'").arg(file.fileName()));
-                    auto cache_loc = QString(cacheLocation().c_str());
-                    if (QString err = extract(file.fileName(), cache_loc); err.isEmpty())
+                    if (QString err = extract(file.fileName(), tmp_dir.path());
+                        err.isEmpty())
                     {
-                        debug(tr("Searching docset in '%1'").arg(cache_loc));
-                        if (QDirIterator it(cache_loc, {"*.docset"}, QDir::Dirs, QDirIterator::Subdirectories); it.hasNext())
+                        debug(tr("Searching docset in '%1'").arg(tmp_dir.path()));
+                        if (QDirIterator it(tmp_dir.path(), {"*.docset"},
+                                            QDir::Dirs, QDirIterator::Subdirectories);
+                            it.hasNext())
                         {
                             auto src = it.next();
-                            auto dst = QString("%1/%2.docset").arg(QDir(dataLocation()).filePath(docsets_dir), ds.name);
+                            auto dst = QDir(docsetsLocation())
+                                           .filePath(QString("%1.docset").arg(ds.name));
                             debug(tr("Renaming '%1' to '%2'").arg(src, dst));
                             if (QFile::rename(src, dst))
                             {
@@ -255,12 +258,10 @@ void Plugin::downloadDocset(uint index)
                                 error(tr("Failed renaming dir '%1' to '%2'.").arg(src, dst));
                         }
                         else
-                            error(tr("Failed finding extracted docset in %1").arg(cache_loc));
+                            error(tr("Failed finding extracted docset in %1").arg(tmp_dir.path()));
                     }
                     else
                         error(tr("Extracting docset failed: '%1' (%2)").arg(file.fileName(), err));
-
-                    QFile::remove(file.fileName());
                 }
                 else
                     error(tr("Failed to write to file: '%1'").arg(file.fileName()));
@@ -307,7 +308,7 @@ void Plugin::removeDocset(uint index)
         emit docsetsChanged();
     }
     else if (QMessageBox::question(nullptr, qApp->applicationName(),
-                                   tr("Remove docset '%1' at %2?").arg(ds.title, ds.path))
+                                   tr("Remove docset '%1'?").arg(ds.title))
              != QMessageBox::Yes)
     {
         DEBG << "Docset removal cancelled by user";
@@ -337,3 +338,7 @@ void Plugin::error(const QString &msg, QWidget * modal_parent)
     emit statusInfo(msg);
     QMessageBox::warning(modal_parent, qApp->applicationDisplayName(), msg);
 }
+
+filesystem::path Plugin::docsetsLocation() const { return dataLocation() / "docsets";  }
+
+filesystem::path Plugin::iconsLocation() const  { return dataLocation() / "icons";  }
