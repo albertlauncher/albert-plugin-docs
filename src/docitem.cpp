@@ -38,9 +38,10 @@ vector<Action> DocItem::actions() const
 void DocItem::open() const
 {
     // QTemporaryFile will not work here because its deletion introduces race condition
-
-    if (QFile file(QDir(Plugin::instance()->cacheLocation()).filePath("trampoline.html"));
-            file.open(QIODevice::WriteOnly))
+    const auto cache = Plugin::instance()->cacheLocation();
+    tryCreateDirectory(cache);
+    if (QFile file(cache / "trampoline.html");
+        file.open(QIODevice::WriteOnly))
     {
         auto url = QString("file:%1/Contents/Resources/Documents/%2").arg(docset.path, path);
         if (!anchor.isEmpty())
