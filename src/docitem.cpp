@@ -1,11 +1,10 @@
-// Copyright (c) 2022-2024 Manuel Schneider
+// Copyright (c) 2022-2025 Manuel Schneider
 
 #include "docitem.h"
 #include "docset.h"
 #include "plugin.h"
 #include <QDir>
 #include <QFile>
-#include <QRegularExpression>
 #include <QTextStream>
 #include <albert/albert.h>
 #include <albert/logging.h>
@@ -16,20 +15,21 @@ using namespace std;
 DocItem::DocItem(const Docset &ds, const QString &t, const QString &n, const QString &p, const QString &a)
     : docset(ds), type(t), name(n), path(p), anchor(a) {}
 
-QString DocItem::id() const
-{ return docset.name + name; }
+QString DocItem::id() const { return docset.name + name; }
 
-QString DocItem::text() const
-{ return name; }
+QString DocItem::text() const { return name; }
 
-QString DocItem::subtext() const
-{ return QString("%1 %2").arg(docset.title, type); }
+QString DocItem::subtext() const { return QString("%1 %2").arg(docset.title, type); }
 
 QStringList DocItem::iconUrls() const
-{ return { "file:" + docset.icon_path }; }
+{
+    return {
+        QStringLiteral("comp:?src1=%1&size1=1&pos1=cc&src2=%2&size2=0.7&pos2=cc")
+            .arg("gen:?text=📚", docset.icon_path)
+    };
+}
 
-QString DocItem::inputActionText() const
-{ return name; }
+QString DocItem::inputActionText() const { return name; }
 
 vector<Action> DocItem::actions() const
 { return {{ id(), Plugin::tr("Open documentation"), [this] { open(); } }}; }
