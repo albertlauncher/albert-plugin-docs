@@ -94,5 +94,9 @@
         <source>Remove docset &apos;%1&apos;?</source>
         <translation>Docset &apos;%1&apos; entfernen?</translation>
     </message>
+    <message>
+        <source>Download finished.</source>
+        <translation>Download abgeschlossen.</translation>
+    </message>
 </context>
 </TS>
