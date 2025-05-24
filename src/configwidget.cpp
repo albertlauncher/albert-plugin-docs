@@ -70,7 +70,7 @@ QVariant DocsetsModel::data(const QModelIndex &index, int role) const
         return ds.title;
 
     case Qt::ToolTipRole:
-        return ds.isInstalled() ? QString("%1 %2").arg(ds.name, ds.path) : ds.name;
+        return ds.isInstalled() ? QStringLiteral("%1 %2").arg(ds.name, ds.path) : ds.name;
     }
 
     return {};

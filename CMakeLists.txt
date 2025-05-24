@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(docs VERSION 8.5)
+project(docs VERSION 8.6)
 
 # Homebrew ships libarchive keg only, include dirs have to be set manually
 # Thats fragile crap but we are not allowed to ship it on macOS anyway.

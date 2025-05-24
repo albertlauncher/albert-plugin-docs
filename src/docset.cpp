@@ -12,9 +12,10 @@
 #include <QXmlStreamReader>
 #include <albert/logging.h>
 #include <set>
+using namespace Qt::StringLiterals;
+using namespace albert::util;
 using namespace albert;
 using namespace std;
-using namespace util;
 
 
 Docset::Docset(QString n, QString t, QString sid, QString ip)
@@ -36,7 +37,7 @@ void Docset::createIndexItems(vector<IndexItem> &results) const
                                              shared(t),
                                              shared(n),
                                              shared(QString(p).remove(dashEntryRegExp)),
-                                             shared(a.section("/", -1)));
+                                             shared(a.section(u"/"_s, -1)));
             index_items.emplace_back(item, item->text());
         }
 
@@ -47,13 +48,13 @@ void Docset::createIndexItems(vector<IndexItem> &results) const
 
         const Docset &docset;
         vector<IndexItem> &index_items;
-        QRegularExpression dashEntryRegExp{"<dash_entry_.*>"};
+        QRegularExpression dashEntryRegExp{u"<dash_entry_.*>"_s};
         set<QString> shared_strings;
 
     } sp(*this, results);
 
 
-    if (auto file_path = QString("%1/Contents/Resources/Tokens.xml").arg(path);
+    if (auto file_path = u"%1/Contents/Resources/Tokens.xml"_s.arg(path);
         QFile::exists(file_path))
     {
         INFO << "Indexing docset" << file_path;
@@ -101,12 +102,13 @@ void Docset::createIndexItems(vector<IndexItem> &results) const
         }
         f.close();
     }
-    else if (file_path = QString("%1/Contents/Resources/docSet.dsidx").arg(path); QFile::exists(file_path))
+    else if (file_path = u"%1/Contents/Resources/docSet.dsidx"_s.arg(path);
+             QFile::exists(file_path))
     {
         INFO << "Indexing docset" << file_path;
 
         {
-            QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", Plugin::instance()->id());
+            QSqlDatabase db = QSqlDatabase::addDatabase(u"QSQLITE"_s, Plugin::instance()->id());
             db.setDatabaseName(file_path);
             if (!db.open())
             {
@@ -114,16 +116,20 @@ void Docset::createIndexItems(vector<IndexItem> &results) const
                 return;
             }
             else if(QSqlQuery sql(db);
-                    sql.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='searchIndex'"))
+                    sql.exec(u"SELECT name "
+                              "FROM sqlite_master "
+                              "WHERE type='table' AND name='searchIndex'"_s))
             {
                 if (sql.next()) // returns true if searchIndex exists
                 {
-                    if (sql.exec("SELECT name, type, path FROM searchIndex ORDER BY name;"))
+                    if (sql.exec(u"SELECT name, type, path "
+                                  "FROM searchIndex "
+                                  "ORDER BY name;"_s))
                         while (sql.next())
                         {
                             auto n = sql.value(0).toString();
                             auto t = sql.value(1).toString();
-                            auto pa = sql.value(2).toString().split("#");
+                            auto pa = sql.value(2).toString().split(u"#"_s);
 
                             if (pa.size() == 2)
                                 sp.add(t, n, pa[0], pa[1]);
@@ -139,15 +145,15 @@ void Docset::createIndexItems(vector<IndexItem> &results) const
                 }
                 else
                 {
-                    if(sql.exec(R"R(
-                        SELECT
-                            ztypename, ztokenname, zpath, zanchor
-                        FROM ztoken
-                            INNER JOIN ztokenmetainformation ON ztoken.zmetainformation = ztokenmetainformation.z_pk
-                            INNER JOIN zfilepath ON ztokenmetainformation.zfile = zfilepath.z_pk
-                            INNER JOIN ztokentype ON ztoken.ztokentype = ztokentype.z_pk
-                        ORDER BY ztokenname;
-                    )R"))
+                    if(sql.exec(u"SELECT ztypename, ztokenname, zpath, zanchor "
+                                 "FROM ztoken "
+                                 "  INNER JOIN ztokenmetainformation "
+                                 "    ON ztoken.zmetainformation = ztokenmetainformation.z_pk "
+                                 "  INNER JOIN zfilepath "
+                                 "    ON ztokenmetainformation.zfile = zfilepath.z_pk "
+                                 "  INNER JOIN ztokentype "
+                                 "    ON ztoken.ztokentype = ztokentype.z_pk "
+                                 "ORDER BY ztokenname;"_s))
                         while (sql.next())
                             sp.add(sql.value(0).toString(),
                                    sql.value(1).toString(),

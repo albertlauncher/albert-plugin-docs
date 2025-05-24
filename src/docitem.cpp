@@ -8,6 +8,7 @@
 #include <QTextStream>
 #include <albert/albert.h>
 #include <albert/logging.h>
+using namespace Qt::StringLiterals;
 using namespace albert;
 using namespace std;
 
@@ -19,13 +20,13 @@ QString DocItem::id() const { return docset.name + name; }
 
 QString DocItem::text() const { return name; }
 
-QString DocItem::subtext() const { return QString("%1 %2").arg(docset.title, type); }
+QString DocItem::subtext() const { return u"%1 %2"_s.arg(docset.title, type); }
 
 QStringList DocItem::iconUrls() const
 {
     return {
-        QStringLiteral("comp:?src1=%1&size1=1&pos1=cc&src2=%2&size2=0.7&pos2=cc")
-            .arg("gen:?text=📚", docset.icon_path)
+        u"comp:?src1=%1&size1=1&pos1=cc&src2=%2&size2=0.7&pos2=cc"_s
+            .arg(u"gen:?text=📚"_s, docset.icon_path)
     };
 }
 
@@ -43,13 +44,13 @@ void DocItem::open() const
     if (QFile file(cache / "trampoline.html");
         file.open(QIODevice::WriteOnly))
     {
-        auto url = QString("file:%1/Contents/Resources/Documents/%2").arg(docset.path, path);
+        auto url = u"file:%1/Contents/Resources/Documents/%2"_s.arg(docset.path, path);
         if (!anchor.isEmpty())
-            url += "#" + anchor;
+            url += u"#"_s + anchor;
 
         QTextStream stream(&file);
-        stream << QString(R"(<html><head><meta http-equiv="refresh" content="0;%1"></head></html>)")
-                  .arg(url);
+        stream << uR"(<html><head><meta http-equiv="refresh" content="0;%1"></head></html>)"_s
+                      .arg(url);
         file.close();
 
         ::open(file.fileName());
