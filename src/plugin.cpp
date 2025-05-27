@@ -12,16 +12,16 @@
 #include <QNetworkRequest>
 #include <QSqlDatabase>
 #include <QTemporaryDir>
-#include <albert/albert.h>
+#include <albert/systemutil.h>
 #include <albert/logging.h>
 #include <albert/networkutil.h>
 #include <archive.h>
 #include <archive_entry.h>
 ALBERT_LOGGING_CATEGORY("docs")
 using namespace Qt::StringLiterals;
+using namespace albert::util;
 using namespace albert;
 using namespace std;
-using namespace util;
 
 Plugin *Plugin::instance_ = nullptr;
 

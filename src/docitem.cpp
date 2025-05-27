@@ -6,8 +6,8 @@
 #include <QDir>
 #include <QFile>
 #include <QTextStream>
-#include <albert/albert.h>
 #include <albert/logging.h>
+#include <albert/systemutil.h>
 using namespace Qt::StringLiterals;
 using namespace albert;
 using namespace std;
@@ -40,7 +40,7 @@ void DocItem::open() const
 {
     // QTemporaryFile will not work here because its deletion introduces race condition
     const auto cache = Plugin::instance()->cacheLocation();
-    tryCreateDirectory(cache);
+    util::tryCreateDirectory(cache);
     if (QFile file(cache / "trampoline.html");
         file.open(QIODevice::WriteOnly))
     {
@@ -53,7 +53,7 @@ void DocItem::open() const
                       .arg(url);
         file.close();
 
-        ::open(file.fileName());
+        util::open(file.fileName());
     }
     else
         WARN << "Failed to open file for writing" << file.fileName() << file.errorString();
