@@ -3,7 +3,6 @@
 #include "configwidget.h"
 #include "plugin.h"
 #include <QAbstractListModel>
-#include <QMessageBox>
 using namespace albert;
 using namespace std;
 
