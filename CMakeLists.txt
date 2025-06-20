@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(docs VERSION 8.8)
+project(docs VERSION 8.9)
 
 # Homebrew ships libarchive keg only, include dirs have to be set manually
 # Thats fragile crap but we are not allowed to ship it on macOS anyway.
@@ -12,5 +12,5 @@ find_package(LibArchive REQUIRED)
 
 albert_plugin(
     LINK PRIVATE LibArchive::LibArchive
-    QT Network Sql Widgets
+    QT Network Sql Widgets Concurrent
 )

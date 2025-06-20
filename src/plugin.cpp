@@ -12,9 +12,10 @@
 #include <QNetworkRequest>
 #include <QSqlDatabase>
 #include <QTemporaryDir>
-#include <albert/systemutil.h>
+#include <QtConcurrentRun>
 #include <albert/logging.h>
 #include <albert/networkutil.h>
+#include <albert/systemutil.h>
 #include <archive.h>
 #include <archive_entry.h>
 ALBERT_LOGGING_CATEGORY("docs")
@@ -114,13 +115,21 @@ Plugin *Plugin::instance() { return instance_; }
 
 void Plugin::updateIndexItems()
 {
-    vector<IndexItem> items;
+    auto future = QtConcurrent::run([this]
+    {
+        // workaround missing move semantics in qtconcurrent
+        auto items = make_shared<vector<IndexItem>>();
 
-    for (const auto &docset : docsets_)
-        if (!docset.path.isNull())
-            docset.createIndexItems(items);
+        for (const auto &docset : docsets_)
+            if (!docset.path.isNull())
+                docset.createIndexItems(*items);
 
-    setIndexItems(::move(items));
+        return items;
+    })
+    .then(this, [this](shared_ptr<vector<IndexItem>> items)
+    {
+        setIndexItems(::move(*items));
+    });
 }
 
 QWidget *Plugin::buildConfigWidget() { return new ConfigWidget; }
