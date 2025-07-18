@@ -103,6 +103,20 @@ Plugin::Plugin()
     connect(this, &Plugin::docsetsChanged, this, &Plugin::updateIndexItems);
 
     updateDocsetList();
+
+    indexer.parallel = [this](const bool &abort)
+    {
+        auto items = make_shared<vector<IndexItem>>(); // workaround missing move semantics in qtconcurrent
+        for (const auto &docset : docsets_)
+            if (!abort && !docset.path.isNull())
+                docset.createIndexItems(*items);
+        return items;
+    };
+
+    indexer.finish = [this](shared_ptr<vector<IndexItem>> && items)
+    {
+        setIndexItems(::move(*items));
+    };
 }
 
 Plugin::~Plugin()
@@ -113,24 +127,7 @@ Plugin::~Plugin()
 
 Plugin *Plugin::instance() { return instance_; }
 
-void Plugin::updateIndexItems()
-{
-    auto future = QtConcurrent::run([this]
-    {
-        // workaround missing move semantics in qtconcurrent
-        auto items = make_shared<vector<IndexItem>>();
-
-        for (const auto &docset : docsets_)
-            if (!docset.path.isNull())
-                docset.createIndexItems(*items);
-
-        return items;
-    })
-    .then(this, [this](shared_ptr<vector<IndexItem>> items)
-    {
-        setIndexItems(::move(*items));
-    });
-}
+void Plugin::updateIndexItems() { indexer.run(); }
 
 QWidget *Plugin::buildConfigWidget() { return new ConfigWidget; }
 

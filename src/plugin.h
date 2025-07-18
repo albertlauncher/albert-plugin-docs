@@ -1,7 +1,8 @@
-// Copyright (c) 2022-2024 Manuel Schneider
+// Copyright (c) 2022-2025 Manuel Schneider
 
 #pragma once
 #include "docset.h"
+#include <albert/backgroundexecutor.h>
 #include <albert/extensionplugin.h>
 #include <albert/indexqueryhandler.h>
 class QNetworkReply;
@@ -40,6 +41,7 @@ private:
     std::vector<Docset> docsets_;
     QNetworkReply *download_ = nullptr;
     static Plugin *instance_;
+    albert::util::BackgroundExecutor<std::shared_ptr<std::vector<albert::util::IndexItem>>> indexer;
 
 signals:
 
