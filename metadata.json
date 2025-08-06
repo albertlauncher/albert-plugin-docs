@@ -4,6 +4,7 @@
     "description": "Offline documentation",
     "description[de]": "Offline-Dokumentation",
     "license": "MIT",
+    "maintainers": ["@manuelschneid3r"],
     "name": "Documentation",
     "name[de]": "Dokumentation",
     "url": "https://github.com/albertlauncher/albert-plugin-docs",
