@@ -1,1 +1,1 @@
-# albert-plugin-docs
+# Albert plugin: Documentation
