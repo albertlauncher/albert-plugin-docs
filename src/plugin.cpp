@@ -229,10 +229,11 @@ void Plugin::downloadDocset(uint index)
 
     connect(download_, &QNetworkReply::finished, this, [this, &ds]
     {
+        auto docsetDir = QDir(docsetsLocation());
         if (download_)  // else aborted
         {
             debug(tr("Download finished."));
-            if (auto tmp_dir = QTemporaryDir();
+            if (auto tmp_dir = QTemporaryDir(docsetDir.filePath(u"extractXXXXXX"_s));
                 tmp_dir.isValid())
             {
                 // write downloaded data to file
@@ -253,8 +254,7 @@ void Plugin::downloadDocset(uint index)
                             it.hasNext())
                         {
                             auto src = it.next();
-                            auto dst = QDir(docsetsLocation())
-                                           .filePath(u"%1.docset"_s.arg(ds.name));
+                            auto dst = docsetDir.filePath(u"%1.docset"_s.arg(ds.name));
                             debug(tr("Renaming '%1' to '%2'").arg(src, dst));
                             if (QFile::rename(src, dst))
                             {
