@@ -98,6 +98,7 @@ Plugin::Plugin()
         throw "QSQLITE driver unavailable";
 
     tryCreateDirectory(docsetsLocation());
+    tryCreateDirectory(customDocsetsLocation());
     tryCreateDirectory(iconsLocation());
 
     connect(this, &Plugin::docsetsChanged, this, &Plugin::updateIndexItems);
@@ -166,6 +167,19 @@ void Plugin::updateDocsetList()
             replyData = reply->readAll();
 
         docsets_.clear();
+
+        for (const auto &entry: filesystem::directory_iterator(customDocsetsLocation()))
+        {
+            const auto path = entry.path();
+            if (entry.is_directory() && path.extension() == ".docset" && filesystem::exists(path / "icon.png"))
+            {
+                const auto dirname = path.filename().string();
+                const auto name = QString::fromStdString(dirname.substr(0, dirname.length() - sizeof(".docset") + 1));
+                const auto icon_path = QString::fromStdString((path / "icon.png").string());
+                docsets_.emplace_back(name, name, u"custom"_s, icon_path);
+                docsets_.back().path = QString::fromStdString(path.string());
+            }
+        }
 
         QJsonParseError parse_error;
         const QJsonDocument json_document = QJsonDocument::fromJson(replyData, &parse_error);
@@ -349,5 +363,7 @@ void Plugin::error(const QString &msg, QWidget * modal_parent)
 }
 
 filesystem::path Plugin::docsetsLocation() const { return dataLocation() / "docsets";  }
+
+filesystem::path Plugin::customDocsetsLocation() const { return dataLocation() / "custom_docsets";  }
 
 filesystem::path Plugin::iconsLocation() const  { return dataLocation() / "icons";  }
