@@ -5,10 +5,14 @@
 #include "plugin.h"
 #include <QDir>
 #include <QFile>
+#include <QPainter>
 #include <QTextStream>
+#include <albert/iconutil.h>
 #include <albert/logging.h>
+#include <albert/networkutil.h>
 #include <albert/systemutil.h>
 using namespace Qt::StringLiterals;
+using namespace albert::util;
 using namespace albert;
 using namespace std;
 
@@ -22,12 +26,34 @@ QString DocItem::text() const { return name; }
 
 QString DocItem::subtext() const { return u"%1 %2"_s.arg(docset.title, type); }
 
-QStringList DocItem::iconUrls() const
+unique_ptr<Icon> DocItem::icon() const
 {
-    return {
-        u"comp:?src1=%1&size1=1&pos1=cc&src2=%2&size2=0.7&pos2=cc"_s
-            .arg(u"gen:?text=📚"_s, docset.icon_path)
+    struct CustomEngine : public Icon
+    {
+        unique_ptr<Icon> icon_;
+
+        CustomEngine(unique_ptr<Icon> e) : icon_(::move(e)) { }
+
+        void paint(QPainter *p, const QRect &rect) override
+        {
+            const auto size = icon_->actualSize(rect.size(), p->device()->devicePixelRatio());
+            const auto src_extent = max(size.width(), size.height());
+            const auto dst_extent = min(rect.width(), rect.height());
+
+            if (src_extent > dst_extent/2)
+                icon_->paint(p, rect);
+            else
+                makeComposedIcon(makeGraphemeIcon(u"📖"_s), icon_->clone(), 1.0, 1.0)->paint(p, rect);
+        }
+
+        bool isNull() override { return icon_->isNull(); }
+
+        unique_ptr<Icon> clone() const override { return make_unique<CustomEngine>(icon_->clone()); }
+
+        QString toUrl() const override { return u"docs:"_s + icon_->toUrl(); }
     };
+
+    return make_unique<CustomEngine>(makeImageIcon(docset.icon_path));
 }
 
 QString DocItem::inputActionText() const { return name; }
@@ -58,3 +84,4 @@ void DocItem::open() const
     else
         WARN << "Failed to open file for writing" << file.fileName() << file.errorString();
 }
+
