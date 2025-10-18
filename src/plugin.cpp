@@ -20,7 +20,6 @@
 #include <archive_entry.h>
 ALBERT_LOGGING_CATEGORY("docs")
 using namespace Qt::StringLiterals;
-using namespace albert::util;
 using namespace albert;
 using namespace std;
 
@@ -97,9 +96,9 @@ Plugin::Plugin()
     if(!QSqlDatabase::isDriverAvailable(u"QSQLITE"_s))
         throw "QSQLITE driver unavailable";
 
-    tryCreateDirectory(docsetsLocation());
-    tryCreateDirectory(customDocsetsLocation());
-    tryCreateDirectory(iconsLocation());
+    filesystem::create_directories(docsetsLocation());
+    filesystem::create_directories(customDocsetsLocation());
+    filesystem::create_directories(iconsLocation());
 
     connect(this, &Plugin::docsetsChanged, this, &Plugin::updateIndexItems);
 

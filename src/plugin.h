@@ -8,8 +8,8 @@
 class QNetworkReply;
 
 
-class Plugin : public albert::util::ExtensionPlugin,
-               public albert::util::IndexQueryHandler
+class Plugin : public albert::ExtensionPlugin,
+               public albert::IndexQueryHandler
 {
     ALBERT_PLUGIN
 
@@ -42,7 +42,7 @@ private:
     std::vector<Docset> docsets_;
     QNetworkReply *download_ = nullptr;
     static Plugin *instance_;
-    albert::util::BackgroundExecutor<std::shared_ptr<std::vector<albert::util::IndexItem>>> indexer;
+    albert::BackgroundExecutor<std::shared_ptr<std::vector<albert::IndexItem>>> indexer;
 
 signals:
 

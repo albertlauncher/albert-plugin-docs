@@ -12,7 +12,6 @@
 #include <albert/networkutil.h>
 #include <albert/systemutil.h>
 using namespace Qt::StringLiterals;
-using namespace albert::util;
 using namespace albert;
 using namespace std;
 
@@ -66,7 +65,7 @@ void DocItem::open() const
 {
     // QTemporaryFile will not work here because its deletion introduces race condition
     const auto cache = Plugin::instance()->cacheLocation();
-    util::tryCreateDirectory(cache);
+    filesystem::create_directories(cache);
     if (QFile file(cache / "trampoline.html");
         file.open(QIODevice::WriteOnly))
     {
@@ -79,7 +78,7 @@ void DocItem::open() const
                       .arg(url);
         file.close();
 
-        util::open(file.fileName());
+        albert::open(file.fileName());
     }
     else
         WARN << "Failed to open file for writing" << file.fileName() << file.errorString();
