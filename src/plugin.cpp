@@ -106,16 +106,18 @@ Plugin::Plugin()
 
     indexer.parallel = [this](const bool &abort)
     {
-        auto items = make_shared<vector<IndexItem>>(); // workaround missing move semantics in qtconcurrent
+        vector<IndexItem> items;
         for (const auto &docset : docsets_)
             if (!abort && !docset.path.isNull())
-                docset.createIndexItems(*items);
+                docset.createIndexItems(items);
         return items;
     };
 
-    indexer.finish = [this](shared_ptr<vector<IndexItem>> && items)
+    indexer.finish = [this]
     {
-        setIndexItems(::move(*items));
+        auto index_items = indexer.takeResult();
+        INFO << u"Indexed %1 documentation symbols."_s.arg(index_items.size());
+        setIndexItems(::move(index_items));
     };
 }
 

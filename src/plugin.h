@@ -42,7 +42,7 @@ private:
     std::vector<Docset> docsets_;
     QNetworkReply *download_ = nullptr;
     static Plugin *instance_;
-    albert::BackgroundExecutor<std::shared_ptr<std::vector<albert::IndexItem>>> indexer;
+    albert::BackgroundExecutor<std::vector<albert::IndexItem>> indexer;
 
 signals:
 
