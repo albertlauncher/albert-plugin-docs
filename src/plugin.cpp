@@ -102,8 +102,6 @@ Plugin::Plugin()
 
     connect(this, &Plugin::docsetsChanged, this, &Plugin::updateIndexItems);
 
-    updateDocsetList();
-
     indexer.parallel = [this](const bool &abort)
     {
         vector<IndexItem> items;
@@ -125,6 +123,14 @@ Plugin::~Plugin()
 {
     if (download_)
         cancelDownload();
+}
+
+void Plugin::initialize()
+{
+    connect(this, &Plugin::docsetsChanged,
+            this, &Plugin::initialized,
+            Qt::SingleShotConnection);
+    updateDocsetList();
 }
 
 Plugin *Plugin::instance() { return instance_; }

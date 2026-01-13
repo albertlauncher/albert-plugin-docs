@@ -7,19 +7,17 @@
 #include <albert/indexqueryhandler.h>
 class QNetworkReply;
 
-
-class Plugin : public albert::ExtensionPlugin,
-               public albert::IndexQueryHandler
+class Plugin : public albert::ExtensionPlugin, public albert::IndexQueryHandler
 {
     ALBERT_PLUGIN
 
 public:
-
     Plugin();
     ~Plugin();
+    void initialize() override;
 
     void updateIndexItems() override;
-    QWidget* buildConfigWidget() override;
+    QWidget *buildConfigWidget() override;
 
     void updateDocsetList();
     const std::vector<Docset> &docsets() const;
@@ -32,7 +30,6 @@ public:
     static Plugin *instance();
 
 private:
-
     void debug(const QString &);
     void error(const QString &, QWidget *modal_parent = nullptr);
     std::filesystem::path docsetsLocation() const;
@@ -48,6 +45,5 @@ signals:
 
     void docsetsChanged();
     void downloadStateChanged();
-    void statusInfo(const QString&);
-
+    void statusInfo(const QString &);
 };
