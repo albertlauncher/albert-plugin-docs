@@ -7,7 +7,7 @@
 #include <QFile>
 #include <QPainter>
 #include <QTextStream>
-#include <albert/iconutil.h>
+#include <albert/icon.h>
 #include <albert/logging.h>
 #include <albert/networkutil.h>
 #include <albert/systemutil.h>
@@ -42,7 +42,7 @@ unique_ptr<Icon> DocItem::icon() const
             if (src_extent > dst_extent/2)
                 icon_->paint(p, rect);
             else
-                makeComposedIcon(makeGraphemeIcon(u"📖"_s), icon_->clone(), 1.0, 1.0)->paint(p, rect);
+                Icon::composed(Icon::grapheme(u"📖"_s), icon_->clone(), 1.0, 1.0)->paint(p, rect);
         }
 
         bool isNull() override { return icon_->isNull(); }
@@ -52,7 +52,7 @@ unique_ptr<Icon> DocItem::icon() const
         QString toUrl() const override { return u"docs:"_s + icon_->toUrl(); }
     };
 
-    return make_unique<CustomEngine>(makeImageIcon(docset.icon_path));
+    return make_unique<CustomEngine>(Icon::image(docset.icon_path));
 }
 
 QString DocItem::inputActionText() const { return name; }
