@@ -234,7 +234,7 @@ void Plugin::downloadDocset(uint index)
 
     auto &ds = docsets_.at(index);
 
-    auto url = u"https://go.zealdocs.org/d/%1/%2/latest"_s.arg(ds.source_id.chopped(5), ds.name);
+    auto url = u"https://go.zealdocs.org/d/%1/%2/latest"_s.arg(ds.source_id, ds.name);
 
     debug(tr("Downloading docset from '%1'").arg(url));
 
